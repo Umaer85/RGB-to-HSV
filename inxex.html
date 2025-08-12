@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>HSV Generator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #222;
+        color: #fff;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .color-picker {
+        margin: 20px;
+      }
+
+      input[type="color"] {
+        width: 120px;
+        height: 60px;
+        border: none;
+        cursor: pointer;
+      }
+
+      .output {
+        margin-top: 20px;
+        font-size: 18px;
+        background: #333;
+        padding: 10px;
+        border-radius: 5px;
+      }
+
+      button {
+        padding: 10px 20px;
+        margin-top: 10px;
+        background: #28a745;
+        border: none;
+        color: white;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>ColorHSV Generator</h1>
+    <div class="color-picker">
+      <input type="color" id="colorInput" value="#ff0000">
+    </div>
+    <button onclick="generateCode()">Generate HSV Code</button>
+    <div class="output" id="output"> Your HSV code will appear here... </div>
+    <script>
+      function rgbToHsv(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        let max = Math.max(r, g, b),
+          min = Math.min(r, g, b);
+        let h, s, v = max;
+        let d = max - min;
+        s = max === 0 ? 0 : d / max;
+        if (max === min) {
+          h = 0; // achromatic
+        } else {
+          switch (max) {
+            case r:
+              h = (g - b) / d + (g < b ? 6 : 0);
+              break;
+            case g:
+              h = (b - r) / d + 2;
+              break;
+            case b:
+              h = (r - g) / d + 4;
+              break;
+          }
+          h /= 6;
+        }
+        // Convert to RGBmatrixPanelGP HSV format
+        let hue16 = Math.round(h * 1536); // Hue range 0-1535
+        let sat8 = Math.round(s * 255); // Saturation 0-255
+        let val8 = Math.round(v * 255); // Value 0-255
+        return {
+          h: hue16,
+          s: sat8,
+          v: val8
+        };
+      }
+
+      function generateCode() {
+        let color = document.getElementById("colorInput").value;
+        let r = parseInt(color.substr(1, 2), 16);
+        let g = parseInt(color.substr(3, 2), 16);
+        let b = parseInt(color.substr(5, 2), 16);
+        let hsv = rgbToHsv(r, g, b);
+        let code = `ColorHSV(${hsv.h}, ${hsv.s}, ${hsv.v}, true);`;
+        document.getElementById("output").textContent = code;
+      }
+    </script>
+  </body>
+</html>
